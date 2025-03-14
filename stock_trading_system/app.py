@@ -148,6 +148,30 @@ def cancel_order(order_id):
         db.session.commit()
     return redirect(url_for('portfolio'))
 
+@app.route('/deposit', methods=['POST'])
+@login_required
+def deposit():
+    amount = float(request.form['amount'])
+    if request.method == 'POST':
+        current_user.cash = current_user.cash + amount
+        db.session.commit()
+        return redirect(url_for('portfolio'))
+    else:
+        return redirect(url_for('portfolio'))
+
+@app.route('/withdraw', methods=['POST'])
+@login_required
+def withdraw():
+    amount = float(request.form['amount'])
+    if amount > current_user.cash:
+        return redirect(url_for('portfolio'))
+    elif amount < current_user.cash:
+        current_user.cash = current_user.cash - amount
+        db.session.commit()
+        return redirect(url_for('portfolio'))
+    else:
+        return redirect(url_for('portfolio'))
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():
