@@ -139,6 +139,37 @@ def sell():
     db.session.commit()
     return redirect(url_for('portfolio'))
 
+# deposit
+@app.route('/deposit', methods=['POST'])
+@login_required
+def deposit():
+    amount = float(request.form['amount'])
+    if request.method == 'POST':
+        current_user.cash = current_user.cash + amount
+        db.session.commit()
+        flash('Successfully deposited!', 'success')
+        return redirect(url_for('portfolio'))
+    else:
+        flash('There was an error with your deposit.', 'error')
+        return redirect(url_for('portfolio'))
+
+# withdraw
+@app.route('/withdraw', methods=['POST'])
+@login_required
+def withdraw():
+    amount = float(request.form['amount'])
+    if amount > current_user.cash:
+        flash('Insufficient Funds.', 'error')
+        return redirect(url_for('portfolio'))
+    elif amount < current_user.cash:
+        flash('Successfully withdrawn!', 'success')
+        current_user.cash = current_user.cash - amount
+        db.session.commit()
+        return redirect(url_for('portfolio'))
+    else:
+        return redirect(url_for('portfolio'))
+
+
 @app.route('/cancel_order/<int:order_id>')
 @login_required
 def cancel_order(order_id):
